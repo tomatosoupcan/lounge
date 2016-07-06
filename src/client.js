@@ -63,6 +63,7 @@ function Client(manager, name, config) {
 		config = {};
 	}
 	_.merge(this, {
+		awayMessage: "no users in the lounge",
 		lastActiveChannel: -1,
 		attachedClients: {},
 		config: config,
@@ -457,11 +458,23 @@ Client.prototype.quit = function() {
 };
 
 Client.prototype.clientAttach = function(socketId) {
+	if (_.size(this.attachedClients) === 0) {
+		this.networks.forEach(function(network) {
+			network.irc.raw("AWAY");
+		});
+	}
+
 	this.attachedClients[socketId] = this.lastActiveChannel;
 };
 
 Client.prototype.clientDetach = function(socketId) {
 	delete this.attachedClients[socketId];
+
+	if (_.size(this.attachedClients) === 0) {
+		this.networks.forEach(function(network) {
+			network.irc.raw("AWAY", this.awayMessage);
+		});
+	}
 };
 
 var timer;

@@ -1,5 +1,6 @@
 "use strict";
 
+var _ = require("lodash");
 var identd = require("../../identd");
 var Msg = require("../../models/msg");
 var Chan = require("../../models/chan");
@@ -18,6 +19,10 @@ module.exports = function(irc, network) {
 			network.channels[0].pushMessage(client, new Msg({
 				text: "Enabled capabilities: " + network.irc.network.cap.enabled.join(", ")
 			}), true);
+		}
+
+		if (_.size(client.attachedClients) === 0) {
+			irc.raw("AWAY", client.awayMessage);
 		}
 
 		var delay = 1000;
