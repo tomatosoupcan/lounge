@@ -46,7 +46,21 @@ body {
 	padding: 15px 16px;
 }
 
+/* stylelint-disable */
 #chat .search::-webkit-input-placeholder {
+/* stylelint-enable */
+	color: #99a2b4;
+	opacity: .5;
+}
+
+/* stylelint-disable */
+#chat .search::-moz-placeholder {
+/* stylelint-enable */
+	color: #99a2b4;
+	opacity: .5;
+}
+
+#chat .search::placeholder {
 	color: #99a2b4;
 	opacity: .5;
 }
