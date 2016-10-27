@@ -844,7 +844,7 @@ $(function() {
 
 		socket.emit("input", {
 			target: chat.data("id"),
-			text: "/whois " + name
+			text: "/whois " + name + " " + name
 		});
 	});
 
