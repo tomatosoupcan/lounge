@@ -254,6 +254,8 @@ $(function() {
 			template = "msg_action";
 		} else if (type === "unhandled") {
 			template = "msg_unhandled";
+		} else if (type === "condensed") {
+			template = "msg_condensed";
 		}
 
 		var msg = $(render(template, data.msg));
@@ -276,10 +278,29 @@ $(function() {
 		return msg;
 	}
 
-	function buildChannelMessages(channel, messages) {
-		return messages.reduce(function(docFragment, message) {
-			docFragment.append(buildChatMessage({
-				chan: channel,
+	function appendMessage(container, chan, type, msg) {
+		if ($(msg).is(".join, .part, .quit, .mode, .kick, .nick") && type !== "lobby") {
+			console.log("part or join");
+			var lastChild = container.children("div.msg").last();
+			if (lastChild && $(lastChild).hasClass("condensed") && !$(msg).hasClass("message")) {
+				lastChild.append(msg);
+			} else if (lastChild && !$(lastChild).hasClass("message") && !$(msg).hasClass("message")) {
+				var condensed = buildChatMessage({msg: {type: "condensed"}, chan: chan});
+				condensed.append(lastChild);
+				condensed.append(msg);
+				container.append(condensed);
+			} else {
+				container.append(msg);
+			}
+		} else {
+			container.append(msg);
+		}
+	}
+
+	function buildChannelMessages(data) {
+		return data.messages.reduce(function(docFragment, message) {
+			appendMessage(docFragment, data.id, data.type, buildChatMessage({
+				chan: data.id,
 				msg: message
 			}));
 			return docFragment;
@@ -292,7 +313,7 @@ $(function() {
 	}
 
 	function renderChannelMessages(data) {
-		var documentFragment = buildChannelMessages(data.id, data.messages);
+		var documentFragment = buildChannelMessages(data);
 		var channel = chat.find("#chan-" + data.id + " .messages").append(documentFragment);
 
 		if (data.firstUnread > 0) {
@@ -397,13 +418,12 @@ $(function() {
 			prevMsg.append(render("date-marker", {msgDate: msgTime}));
 		}
 
-        // Add message to the container
-		container
-			.append(msg)
-			.trigger("msg", [
-				target,
-				data
-			]);
+		appendMessage(container, data.chan, undefined, msg);
+
+		container.trigger("msg", [
+			target,
+			data
+		]);
 
 		if (data.msg.self) {
 			container
@@ -413,7 +433,7 @@ $(function() {
 	});
 
 	socket.on("more", function(data) {
-		var documentFragment = buildChannelMessages(data.chan, data.messages);
+		var documentFragment = buildChannelMessages(data);
 		var chan = chat
 			.find("#chan-" + data.chan)
 			.find(".messages");
@@ -898,6 +918,10 @@ $(function() {
 				text: "/join " + name
 			});
 		}
+	});
+
+	chat.on("click", ".condensed", function() {
+		$(this).toggleClass("closed");
 	});
 
 	chat.on("click", ".user", function() {
