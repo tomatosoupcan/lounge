@@ -278,17 +278,43 @@ $(function() {
 		return msg;
 	}
 
-	function appendMessage(container, chan, type, msg) {
-		if ($(msg).is(".join, .part, .quit, .mode, .kick, .nick") && type !== "lobby") {
-			console.log("part or join");
+	function updateCondensedText(condensed, type) {
+		var obj = {};
+		var types = ["part", "join", "mode", "kick", "nick"];
+
+		for (var i in types) {
+			var msgType = types[i];
+			obj[msgType] = condensed.data(msgType) || 0;
+			if (type === msgType) {
+				obj[msgType]++;
+				condensed.data(msgType, obj[msgType]);
+			}
+		}
+
+		var text = "";
+
+		for (var j in types) {
+			var messageType = types[j];
+			if (obj[messageType]) {
+				text += text === "" ? "" : ", ";
+				text += obj[messageType] + " " + messageType + (obj[messageType] > 1 ? "s" : "");
+			}
+		}
+		$(condensed.children(".text")[0]).text(text);
+	}
+
+	function appendMessage(container, chan, chanType, messageType, msg) {
+		if (["join", "part", "quit", "mode", "kick", "nick"].indexOf(messageType) !== -1 && chanType !== "lobby") {
 			var lastChild = container.children("div.msg").last();
 			if (lastChild && $(lastChild).hasClass("condensed") && !$(msg).hasClass("message")) {
 				lastChild.append(msg);
+				updateCondensedText(lastChild, messageType);
 			} else if (lastChild && !$(lastChild).hasClass("message") && !$(msg).hasClass("message")) {
 				var condensed = buildChatMessage({msg: {type: "condensed"}, chan: chan});
 				condensed.append(lastChild);
 				condensed.append(msg);
 				container.append(condensed);
+				updateCondensedText(condensed, messageType);
 			} else {
 				container.append(msg);
 			}
@@ -299,7 +325,7 @@ $(function() {
 
 	function buildChannelMessages(data) {
 		return data.messages.reduce(function(docFragment, message) {
-			appendMessage(docFragment, data.id, data.type, buildChatMessage({
+			appendMessage(docFragment, data.id, data.type, message.type, buildChatMessage({
 				chan: data.id,
 				msg: message
 			}));
@@ -418,7 +444,8 @@ $(function() {
 			prevMsg.append(render("date-marker", {msgDate: msgTime}));
 		}
 
-		appendMessage(container, data.chan, undefined, msg);
+
+		appendMessage(container, data.chan, undefined, data.msg.type, msg);
 
 		container.trigger("msg", [
 			target,
