@@ -66,7 +66,10 @@
 								--><span id="save-nick-tooltip" class="tooltipped tooltipped-e" aria-label="Save"><button id="submit-nick" type="button" aria-label="Save"></button></span>
 							</span>
 							<textarea id="input" class="mousetrap"></textarea>
-							<span class="tooltipped tooltipped-w" aria-label="Send message">
+							<span id="cycle-nicks-tooltip" class="tooltipped tooltipped-w" aria-label="Cycle through nicks">
+								<button id="cycle-nicks" type="button" aria-label="Cycle through nicks"></button>
+							</span>
+							<span id="submit-tooltip" class="tooltipped tooltipped-w" aria-label="Send message">
 								<button id="submit" type="submit" aria-label="Send message"></button>
 							</span>
 						</div>
@@ -85,7 +88,7 @@
 								</label>
 							</div>
 							<div class="col-xs-12">
-								<label class="port">
+								<label>
 								Password
 								<input class="input" type="password" name="password">
 								</label>
@@ -283,7 +286,14 @@
 								<label class="opt">
 								<input id="desktopNotifications" type="checkbox" name="desktopNotifications">
 								Enable desktop notifications<br>
-								<div class="error" id="warnDisabledDesktopNotifications"><strong>Warning</strong>: Desktop notifications are blocked by your web browser</div>
+								<div class="error" id="warnUnsupportedDesktopNotifications">
+									<strong>Warning</strong>:
+									Desktop notifications are not supported by your browser.
+								</div>
+								<div class="error" id="warnBlockedDesktopNotifications">
+									<strong>Warning</strong>:
+									Desktop notifications are blocked by your browser.
+								</div>
 								</label>
 							</div>
 							<div class="col-sm-12">

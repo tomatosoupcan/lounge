@@ -25,8 +25,8 @@
 	font-weight: normal;
 	font-style: normal;
 	src:
-		url("../fonts/fontawesome-webfont.woff2?v=4.6.3") format("woff2"),
-		url("../fonts/fontawesome-webfont.woff?v=4.6.3") format("woff");
+		url("../fonts/fontawesome-webfont.woff2?v=4.7.0") format("woff2"),
+		url("../fonts/fontawesome-webfont.woff?v=4.7.0") format("woff");
 }
 
 html,
@@ -141,6 +141,7 @@ button {
 #footer .icon,
 #chat .count:before,
 #settings #play:before,
+#form #cycle-nicks:before,
 #form #submit:before,
 #chat .invite .from:before,
 #chat .join .from:before,
@@ -185,6 +186,8 @@ button {
 #footer .connect:before { content: "\f067"; /* http://fontawesome.io/icon/plus/ */ }
 #footer .settings:before { content: "\f013"; /* http://fontawesome.io/icon/cog/ */ }
 #footer .sign-out:before { content: "\f011"; /* http://fontawesome.io/icon/power-off/ */ }
+
+#form #cycle-nicks:before { content: "\f007"; /* http://fontawesome.io/icon/user/ */ }
 
 #form #submit:before { content: "\f1d8"; /* http://fontawesome.io/icon/paper-plane/ */ }
 
@@ -409,6 +412,7 @@ button {
 	text-align: left;
 	transition: color .2s;
 	width: 180px;
+	left: auto !important; /* Fix for drag'n'drop not recalculating left position */
 }
 
 #sidebar .chan-placeholder {
@@ -645,7 +649,7 @@ button {
 }
 
 #windows .window h2 {
-	border-bottom: 1px solid #eee;
+	border-bottom: 1px solid #7f8c8d;
 	color: #7f8c8d;
 	font-size: 22px;
 	margin: 30px 0 10px;
@@ -833,6 +837,33 @@ button {
 
 #chat .unread-marker:last-child {
 	display: none;
+}
+
+#chat .date-marker {
+	position: relative;
+	text-align: center;
+	opacity: .5;
+	margin: 0 10px;
+	z-index: 0;
+	font-weight: bold;
+	font-size: 12px;
+}
+
+#chat .date-marker:before {
+	position: absolute;
+	z-index: -1;
+	content: "";
+	left: 0;
+	right: 0;
+	top: 50%;
+	border-top: 1px solid #006b3b;
+}
+
+#chat .date-marker-text:before {
+	content: attr(data-date);
+	background-color: white;
+	color: #006b3b;
+	padding: 0 10px;
 }
 
 .inline-channel {
@@ -1361,16 +1392,22 @@ button {
 	align-self: center;
 }
 
+#form #cycle-nicks,
 #form #submit {
 	color: #9ca5b4;
 	font-size: 14px;
 	height: 32px;
 	transition: opacity .2s;
-	width: 32px;
+	width: 24px;
 	-webkit-flex: 0 0 auto;
 	flex: 0 0 auto;
 }
 
+#form #submit {
+	margin-right: 4px;
+}
+
+#form #cycle-nicks:hover,
 #form #submit:hover {
 	opacity: .6;
 }
