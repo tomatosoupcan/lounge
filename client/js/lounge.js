@@ -35,6 +35,9 @@ $(function() {
 
 	var sidebar = $("#sidebar, #footer");
 	var chat = $("#chat");
+	let isSubscribed = false;
+	let swRegistration = null;
+	const applicationServerPublicKey = '<public-key>'; //this would need to be pulled from the vapid keys somehow	
 
 	var pop;
 	try {
@@ -85,6 +88,62 @@ $(function() {
 	socket.on("authorized", function() {
 		$("#loading-page-message").text("Authorized, loading messages…");
 	});
+
+	function urlB64ToUint8Array(base64String) {
+	  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+	  const base64 = (base64String + padding)
+	    .replace(/\-/g, '+')
+	    .replace(/_/g, '/');
+
+	  const rawData = window.atob(base64);
+	  const outputArray = new Uint8Array(rawData.length);
+
+	  for (let i = 0; i < rawData.length; ++i) {
+	    outputArray[i] = rawData.charCodeAt(i);
+	  }
+	  return outputArray;
+		}
+
+	function updateSubscriptionOnServer(subscription) {
+	  if (subscription) {
+	    window.prompt("This is your subscription info", JSON.stringify(subscription)); //usually this would be sent to the server, but we are sending it manually because I only need it once
+		}
+	}
+
+	function subscribeUser() {
+  		const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
+  		swRegistration.pushManager.subscribe({
+    		userVisibleOnly: true,
+    		applicationServerKey: applicationServerKey
+  		})
+  		.then(function(subscription) {
+    		console.log('User is subscribed:', subscription);
+		updateSubscriptionOnServer(subscription);
+    		isSubscribed = true;
+
+  		})
+  		.catch(function(err) {
+    		console.log('Failed to subscribe the user: ', err);
+  		});
+	}
+
+	if ('serviceWorker' in navigator && 'PushManager' in window) {
+  		console.log('Service Worker and Push is supported');
+
+  		navigator.serviceWorker.register('js/push.js')
+  		.then(function(swReg) {
+   		console.log('Service Worker is registered', swReg);
+
+    		swRegistration = swReg;
+		subscribeUser(); //generally this would be raised once a user pressed a button or checked a box like "Allow Push Notifications", also for some reason this only works on the second refresh of the page
+  		})
+  		.catch(function(error) {
+    			console.error('Service Worker Error', error);
+  		});
+	} else {
+	  console.warn('Push messaging is not supported');
+	  pushButton.textContent = 'Push Not Supported';
+	}
 
 	socket.on("auth", function(data) {
 		var login = $("#sign-in");
