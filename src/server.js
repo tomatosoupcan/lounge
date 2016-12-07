@@ -88,10 +88,7 @@ in ${config.public ? "public" : "private"} mode`);
 	log.info(`Press Ctrl-C to stop\n`);
 
 	if (!config.public) {
-		manager.loadUsers();
-		if (config.autoload) {
-			manager.autoload();
-		}
+		manager.autoloadUsers();
 	}
 };
 
