@@ -2,6 +2,23 @@
 
 var Chan = require("../../models/chan");
 var Msg = require("../../models/msg");
+const webpush = require('web-push');
+webpush.setGCMAPIKey('<GCM-API>'); //hard-coded api key will need to be swapped out for a config file line somewhere
+webpush.setVapidDetails(
+	'mailto:example@gmail.com',
+	'<vapid-public>',
+	'<vapid-private>'
+); //vapid details need to be generated once somewhere and stored or added to config file somewhere
+const pushSub = {
+	endpoint: '<endpoint>',
+	keys: {
+		auth: '<auth>',
+		p256dh: '<p256dh>'
+	}
+}; //push destinations are currently hard-coded after being copied out from the prompt window, this will need to be replaced with some form of http communication and db storage for push details more than likely
+
+
+
 
 module.exports = function(irc, network) {
 	var client = this;
@@ -89,5 +106,9 @@ module.exports = function(irc, network) {
 			highlight: highlight
 		});
 		chan.pushMessage(client, msg, !self);
+
+		if (highlight === true){
+			webpush.sendNotification(pushSub, data.nick + ' says:♭' + data.message);
+		} //would need to check against db and send to all subscribed devices, for whatever reason this only allows sending straight text, so I am sending with a char I think won't ever be used and then splitting back out on that on the client
 	}
 };
