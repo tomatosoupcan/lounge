@@ -1390,7 +1390,7 @@ $(function() {
 			function(w) {
 				return !w.toLowerCase().indexOf(word.toLowerCase());
 			}
-		) + ' ';
+		);
 	}
 
 	function confirmExit() {
