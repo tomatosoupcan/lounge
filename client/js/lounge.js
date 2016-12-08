@@ -846,7 +846,7 @@ $(function() {
 
 			$("#chat .chan.active .chat").trigger("msg.sticky"); // fix growing
 		})
-		.tab(complete, {hint: false});
+		.tab(complete, {hint: false, after:" "});
 
 	// Cycle through nicks for the current word, just like hitting "Tab"
 	$("#cycle-nicks").on("click", function() {
@@ -1390,7 +1390,7 @@ $(function() {
 			function(w) {
 				return !w.toLowerCase().indexOf(word.toLowerCase());
 			}
-		);
+		) + ' ';
 	}
 
 	function confirmExit() {
